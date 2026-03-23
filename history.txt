@@ -1,0 +1,12 @@
+if choice == "1":
+    amount = int(input("Enter amount: "))
+    balance += amount
+    print("Deposited successfully")
+
+    with open("balance.txt", "w") as f:
+        f.write(str(balance))
+
+    # ✅ ADD THIS
+    with open("history.txt", "a") as f:
+        f.write(f"Deposited: {amount}\n")Deposited: 500
+Deposited: 1000
