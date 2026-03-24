@@ -1,12 +1,10 @@
-if choice == "1":
-    amount = int(input("Enter amount: "))
-    balance += amount
-    print("Deposited successfully")
-
-    with open("balance.txt", "w") as f:
-        f.write(str(balance))
-
-    # ✅ ADD THIS
-    with open("history.txt", "a") as f:
-        f.write(f"Deposited: {amount}\n")Deposited: 500
-Deposited: 1000
+25-03-2026 12:08 AM|Deposit|2
+25-03-2026 12:09 AM|Deposit|2
+25-03-2026 12:09 AM|Withdraw|3
+25-03-2026 12:14 AM|Withdraw|1|3
+25-03-2026 12:14 AM|Deposit|8|11
+25-03-2026 12:14 AM|Withdraw|6|5
+25-03-2026 12:15 AM|Deposit|-3|2
+25-03-2026 12:19 AM|Deposit|8|10
+25-03-2026 12:19 AM|Withdraw|5|5
+25-03-2026 12:46 AM|Deposit|1000|1005
