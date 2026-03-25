@@ -1,117 +1,85 @@
-import os
-from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+import os
 
-# ---------- BALANCE ----------
+# ---------------- FUNCTIONS ---------------- #
 
-def get_balance():
-    if not os.path.exists("balance.txt"):
-        return 0
-    with open("balance.txt", "r") as f:
-        data = f.read().strip()
-        return int(data) if data else 0
-
-def set_balance(balance):
-    with open("balance.txt", "w") as f:
-        f.write(str(balance))
-
-# ---------- HISTORY ----------
-
-def add_history(action, amount, balance):
-    time = datetime.now().strftime("%d-%m-%Y %I:%M %p")
-    with open("history.txt", "a") as f:
-        f.write(f"{time}|{action}|{amount}|{balance}\n")
-
-def show_history():
-    try:
-        with open("history.txt", "r") as f:
-            data = f.read()
-            if not data:
-                messagebox.showinfo("History", "No transactions yet")
-            else:
-                messagebox.showinfo("Transaction History", data)
-    except:
-        messagebox.showinfo("History", "No history found")
-
-# ---------- OPERATIONS ----------
+balance = 0
+history = []
 
 def deposit():
+    global balance
     try:
-        amount = int(entry.get())
-        if amount <= 0:
-            messagebox.showerror("Error", "Enter positive amount")
-            return
-
-        bal = get_balance()
-        bal += amount
-        set_balance(bal)
-        add_history("Deposit", amount, bal)
-
-        messagebox.showinfo("Success", "Deposit successful")
+        amt = float(entry.get())
+        balance += amt
+        history.append(f"Deposited: ₹{amt}")
+        messagebox.showinfo("Success", f"Deposited ₹{amt}")
         entry.delete(0, tk.END)
-
     except:
-        messagebox.showerror("Error", "Enter valid number")
+        messagebox.showerror("Error", "Enter valid amount")
 
 def withdraw():
+    global balance
     try:
-        amount = int(entry.get())
-        if amount <= 0:
-            messagebox.showerror("Error", "Enter positive amount")
-            return
-
-        bal = get_balance()
-
-        if amount > bal:
-            messagebox.showerror("Error", "Insufficient balance")
-            return
-
-        bal -= amount
-        set_balance(bal)
-        add_history("Withdraw", amount, bal)
-
-        messagebox.showinfo("Success", "Withdrawal successful")
+        amt = float(entry.get())
+        if amt > balance:
+            messagebox.showerror("Error", "Insufficient Balance")
+        else:
+            balance -= amt
+            history.append(f"Withdrawn: ₹{amt}")
+            messagebox.showinfo("Success", f"Withdrawn ₹{amt}")
         entry.delete(0, tk.END)
-
     except:
-        messagebox.showerror("Error", "Enter valid number")
+        messagebox.showerror("Error", "Enter valid amount")
 
 def check_balance():
-    bal = get_balance()
-    messagebox.showinfo("Balance", f"Current Balance: ₹{bal}")
+    messagebox.showinfo("Balance", f"Your Balance: ₹{balance}")
 
-# ---------- GUI ----------
+def show_history():
+    if history:
+        messagebox.showinfo("History", "\n".join(history))
+    else:
+        messagebox.showinfo("History", "No transactions yet")
+
+def exit_app():
+    root.destroy()
+
+# ---------------- GUI ---------------- #
 
 root = tk.Tk()
 root.title("VTU BANK")
 root.geometry("400x500")
-root.resizable(False, False)
 
-# Logo
+# ✅ LOGO FIX (Dynamic Path)
 try:
-    img = Image.open("logo.png")
-    img = img.resize((120, 120))
-    photo = ImageTk.PhotoImage(img)
+    base_path = os.path.dirname(__file__)
+    img_path = os.path.join(base_path, "logo.png")
 
-    label_logo = tk.Label(root, image=photo)
-    label_logo.pack(pady=10)
-except:
-    tk.Label(root, text="🏦 VTU BANK", font=("Arial", 20)).pack(pady=10)
+    img = Image.open(img_path)
+    img = img.resize((80, 80))
+    logo = ImageTk.PhotoImage(img)
+
+    logo_label = tk.Label(root, image=logo)
+    logo_label.image = logo
+    logo_label.pack(pady=10)
+
+except Exception as e:
+    print("LOGO ERROR:", e)
 
 # Title
-tk.Label(root, text="VTU BANK", font=("Arial", 18, "bold")).pack()
+tk.Label(root, text="VTU BANK", font=("Arial", 20, "bold")).pack()
+tk.Label(root, text="Welcome to VTU BANK").pack(pady=5)
 
 # Entry
-entry = tk.Entry(root, font=("Arial", 14), justify="center")
-entry.pack(pady=15)
+entry = tk.Entry(root, width=25)
+entry.pack(pady=10)
 
 # Buttons
 tk.Button(root, text="Deposit", width=20, command=deposit).pack(pady=5)
 tk.Button(root, text="Withdraw", width=20, command=withdraw).pack(pady=5)
 tk.Button(root, text="Check Balance", width=20, command=check_balance).pack(pady=5)
 tk.Button(root, text="Show History", width=20, command=show_history).pack(pady=5)
-tk.Button(root, text="Exit", width=20, command=root.quit).pack(pady=15)
+tk.Button(root, text="Exit", width=20, command=exit_app).pack(pady=10)
 
 root.mainloop()
