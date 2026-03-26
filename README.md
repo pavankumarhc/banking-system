@@ -2,7 +2,6 @@
 
 A simple and interactive Banking System Web Application built using Python and Streamlit.
 This app allows users to perform basic banking operations like checking balance, depositing money, and withdrawing money.
-This project is built based on the the Python and Streamlit (to deploy).
 
 ---
 
