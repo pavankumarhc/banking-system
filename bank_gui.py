@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from PIL import Image, ImageTk   # for resizing image
 
 # ------------------ DATA ------------------
 balance = 0
@@ -56,13 +57,17 @@ def show_history():
 
 root = Tk()
 root.title("VTU BANK")
-root.geometry("400x500")
+root.geometry("400x550")
 
-# -------- LOGO --------
+# -------- LOGO (RESIZED) --------
 try:
-    logo = PhotoImage(file="logo.png")
+    img = Image.open("logo.png")
+    img = img.resize((200, 200))   # resize here
+    logo = ImageTk.PhotoImage(img)
+
     logo_label = Label(root, image=logo)
     logo_label.pack(pady=10)
+
 except:
     print("Logo not found")
 
@@ -74,7 +79,7 @@ Label(root, text="Welcome to VTU BANK").pack(pady=5)
 entry = Entry(root, font=("Arial", 14))
 entry.pack(pady=10)
 
-# -------- BUTTONS (CONNECTED) --------
+# -------- BUTTONS --------
 Button(root, text="Deposit", width=20, command=deposit).pack(pady=5)
 Button(root, text="Withdraw", width=20, command=withdraw).pack(pady=5)
 Button(root, text="Check Balance", width=20, command=check_balance).pack(pady=5)
