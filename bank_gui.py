@@ -1,85 +1,88 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
-from PIL import Image, ImageTk
-import os
 
-# ---------------- FUNCTIONS ---------------- #
-
+# ------------------ DATA ------------------
 balance = 0
 history = []
+
+# ------------------ FUNCTIONS ------------------
 
 def deposit():
     global balance
     try:
-        amt = float(entry.get())
-        balance += amt
-        history.append(f"Deposited: ₹{amt}")
-        messagebox.showinfo("Success", f"Deposited ₹{amt}")
-        entry.delete(0, tk.END)
+        amount = int(entry.get())
+        if amount <= 0:
+            raise ValueError
+
+        balance += amount
+        history.append(f"Deposited ₹{amount}")
+        result_label.config(text=f"Deposited: ₹{amount}")
+        entry.delete(0, END)
+
     except:
         messagebox.showerror("Error", "Enter valid amount")
+
 
 def withdraw():
     global balance
     try:
-        amt = float(entry.get())
-        if amt > balance:
-            messagebox.showerror("Error", "Insufficient Balance")
+        amount = int(entry.get())
+
+        if amount > balance:
+            result_label.config(text="Insufficient Balance")
         else:
-            balance -= amt
-            history.append(f"Withdrawn: ₹{amt}")
-            messagebox.showinfo("Success", f"Withdrawn ₹{amt}")
-        entry.delete(0, tk.END)
+            balance -= amount
+            history.append(f"Withdrawn ₹{amount}")
+            result_label.config(text=f"Withdrawn: ₹{amount}")
+
+        entry.delete(0, END)
+
     except:
         messagebox.showerror("Error", "Enter valid amount")
 
+
 def check_balance():
-    messagebox.showinfo("Balance", f"Your Balance: ₹{balance}")
+    result_label.config(text=f"Balance: ₹{balance}")
+
 
 def show_history():
-    if history:
-        messagebox.showinfo("History", "\n".join(history))
+    if not history:
+        result_label.config(text="No transactions yet")
     else:
-        messagebox.showinfo("History", "No transactions yet")
+        result_label.config(text="\n".join(history))
 
-def exit_app():
-    root.destroy()
 
-# ---------------- GUI ---------------- #
+# ------------------ GUI ------------------
 
-root = tk.Tk()
+root = Tk()
 root.title("VTU BANK")
 root.geometry("400x500")
 
-# ✅ LOGO FIX (Dynamic Path)
+# -------- LOGO --------
 try:
-    base_path = os.path.dirname(__file__)
-    img_path = os.path.join(base_path, "logo.png")
-
-    img = Image.open(img_path)
-    img = img.resize((80, 80))
-    logo = ImageTk.PhotoImage(img)
-
-    logo_label = tk.Label(root, image=logo)
-    logo_label.image = logo
+    logo = PhotoImage(file="logo.png")
+    logo_label = Label(root, image=logo)
     logo_label.pack(pady=10)
+except:
+    print("Logo not found")
 
-except Exception as e:
-    print("LOGO ERROR:", e)
+# -------- TITLE --------
+Label(root, text="VTU BANK", font=("Arial", 20, "bold")).pack()
+Label(root, text="Welcome to VTU BANK").pack(pady=5)
 
-# Title
-tk.Label(root, text="VTU BANK", font=("Arial", 20, "bold")).pack()
-tk.Label(root, text="Welcome to VTU BANK").pack(pady=5)
-
-# Entry
-entry = tk.Entry(root, width=25)
+# -------- INPUT --------
+entry = Entry(root, font=("Arial", 14))
 entry.pack(pady=10)
 
-# Buttons
-tk.Button(root, text="Deposit", width=20, command=deposit).pack(pady=5)
-tk.Button(root, text="Withdraw", width=20, command=withdraw).pack(pady=5)
-tk.Button(root, text="Check Balance", width=20, command=check_balance).pack(pady=5)
-tk.Button(root, text="Show History", width=20, command=show_history).pack(pady=5)
-tk.Button(root, text="Exit", width=20, command=exit_app).pack(pady=10)
+# -------- BUTTONS (CONNECTED) --------
+Button(root, text="Deposit", width=20, command=deposit).pack(pady=5)
+Button(root, text="Withdraw", width=20, command=withdraw).pack(pady=5)
+Button(root, text="Check Balance", width=20, command=check_balance).pack(pady=5)
+Button(root, text="Show History", width=20, command=show_history).pack(pady=5)
+Button(root, text="Exit", width=20, command=root.quit).pack(pady=5)
+
+# -------- RESULT --------
+result_label = Label(root, text="", fg="green", font=("Arial", 12))
+result_label.pack(pady=10)
 
 root.mainloop()
