@@ -6,18 +6,19 @@ from PIL import Image, ImageTk
 balance = 0
 history = []
 
-# ------------------ LOGIN FUNCTION ------------------
+BG_COLOR = "#0f172a"       # dark background
+CARD_COLOR = "#1e293b"     # card color
+BTN_COLOR = "#22c55e"      # green button
+TEXT_COLOR = "white"
+
+# ------------------ LOGIN ------------------
 
 def login():
-    username = user_entry.get()
-    password = pass_entry.get()
-
-    if username == "admin" and password == "1234":
+    if user_entry.get() == "admin" and pass_entry.get() == "1234":
         login_window.destroy()
         open_bank()
     else:
-        messagebox.showerror("Error", "Invalid Username or Password")
-
+        messagebox.showerror("Error", "Invalid Login")
 
 # ------------------ BANK FUNCTIONS ------------------
 
@@ -29,9 +30,9 @@ def deposit():
             raise ValueError
 
         balance += amount
-        history.append(f"Deposited ₹{amount}")
-        result_label.config(text=f"Deposited: ₹{amount}")
-        entry.delete(0, END)
+        history.append(f"+ ₹{amount}")
+        result_label.config(text=f"Deposited ₹{amount}")
+        update_balance()
 
     except:
         messagebox.showerror("Error", "Enter valid amount")
@@ -46,81 +47,104 @@ def withdraw():
             result_label.config(text="Insufficient Balance")
         else:
             balance -= amount
-            history.append(f"Withdrawn ₹{amount}")
-            result_label.config(text=f"Withdrawn: ₹{amount}")
-
-        entry.delete(0, END)
+            history.append(f"- ₹{amount}")
+            result_label.config(text=f"Withdrawn ₹{amount}")
+            update_balance()
 
     except:
         messagebox.showerror("Error", "Enter valid amount")
 
 
-def check_balance():
-    result_label.config(text=f"Balance: ₹{balance}")
+def update_balance():
+    balance_label.config(text=f"₹ {balance}")
 
 
 def show_history():
     if not history:
-        result_label.config(text="No transactions yet")
+        result_label.config(text="No transactions")
     else:
-        result_label.config(text="\n".join(history))
+        result_label.config(text="\n".join(history[-5:]))
 
 
-# ------------------ BANK WINDOW ------------------
+# ------------------ BANK UI ------------------
 
 def open_bank():
-    global entry, result_label
+    global entry, result_label, balance_label
 
     root = Tk()
     root.title("VTU BANK")
-    root.geometry("400x550")
+    root.geometry("400x600")
+    root.configure(bg=BG_COLOR)
 
-    # Logo
+    # -------- LOGO --------
     try:
-        img = Image.open("logo.png")
-        img = img.resize((200, 200))
+        img = Image.open("logo.png").resize((120, 120))
         logo = ImageTk.PhotoImage(img)
 
-        logo_label = Label(root, image=logo)
-        logo_label.image = logo
-        logo_label.pack(pady=10)
+        Label(root, image=logo, bg=BG_COLOR).pack(pady=10)
+        root.logo = logo
     except:
         pass
 
-    Label(root, text="VTU BANK", font=("Arial", 20, "bold")).pack()
-    Label(root, text="Welcome to VTU BANK").pack(pady=5)
+    # -------- TITLE --------
+    Label(root, text="VTU BANK", fg=TEXT_COLOR, bg=BG_COLOR,
+          font=("Arial", 20, "bold")).pack()
 
-    entry = Entry(root, font=("Arial", 14))
-    entry.pack(pady=10)
+    # -------- BALANCE CARD --------
+    frame = Frame(root, bg=CARD_COLOR, padx=20, pady=20)
+    frame.pack(pady=15, padx=20, fill="x")
 
-    Button(root, text="Deposit", width=20, command=deposit).pack(pady=5)
-    Button(root, text="Withdraw", width=20, command=withdraw).pack(pady=5)
-    Button(root, text="Check Balance", width=20, command=check_balance).pack(pady=5)
-    Button(root, text="Show History", width=20, command=show_history).pack(pady=5)
-    Button(root, text="Exit", width=20, command=root.quit).pack(pady=5)
+    Label(frame, text="Current Balance", fg="lightgray",
+          bg=CARD_COLOR).pack()
 
-    result_label = Label(root, text="", fg="green", font=("Arial", 12))
+    balance_label = Label(frame, text="₹ 0", fg=BTN_COLOR,
+                          bg=CARD_COLOR, font=("Arial", 24, "bold"))
+    balance_label.pack()
+
+    # -------- INPUT --------
+    entry = Entry(root, font=("Arial", 14), justify="center")
+    entry.pack(pady=15, ipadx=10, ipady=5)
+
+    # -------- BUTTON STYLE --------
+    def styled_button(text, cmd):
+        return Button(root, text=text, command=cmd,
+                      bg=BTN_COLOR, fg="black",
+                      font=("Arial", 11, "bold"),
+                      width=20, pady=5)
+
+    styled_button("Deposit", deposit).pack(pady=5)
+    styled_button("Withdraw", withdraw).pack(pady=5)
+    styled_button("Check Balance", update_balance).pack(pady=5)
+    styled_button("Transaction History", show_history).pack(pady=5)
+
+    Button(root, text="Exit", command=root.quit,
+           bg="red", fg="white", width=20).pack(pady=10)
+
+    # -------- RESULT --------
+    result_label = Label(root, text="", fg="white",
+                         bg=BG_COLOR, font=("Arial", 11))
     result_label.pack(pady=10)
 
     root.mainloop()
 
 
-# ------------------ LOGIN WINDOW ------------------
+# ------------------ LOGIN UI ------------------
 
 login_window = Tk()
 login_window.title("VTU BANK LOGIN")
-login_window.geometry("300x250")
+login_window.geometry("300x300")
+login_window.configure(bg=BG_COLOR)
 
-Label(login_window, text="Login", font=("Arial", 18, "bold")).pack(pady=10)
+Label(login_window, text="VTU BANK", fg="white", bg=BG_COLOR,
+      font=("Arial", 18, "bold")).pack(pady=20)
 
-Label(login_window, text="Username").pack()
 user_entry = Entry(login_window)
-user_entry.pack(pady=5)
+user_entry.pack(pady=10, ipadx=10, ipady=5)
 
-Label(login_window, text="Password").pack()
 pass_entry = Entry(login_window, show="*")
-pass_entry.pack(pady=5)
+pass_entry.pack(pady=10, ipadx=10, ipady=5)
 
-Button(login_window, text="Login", width=15, command=login).pack(pady=15)
+Button(login_window, text="Login", command=login,
+       bg=BTN_COLOR, width=15).pack(pady=20)
 
 login_window.mainloop()
