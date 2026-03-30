@@ -87,6 +87,8 @@ To deploy your own:
 
 Pavan Kumar H C
 Computer Science Engineering Student
+Studying at VTU ,MYSORE
+
 
 ---
 
